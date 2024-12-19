@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import com.ql.util.express.exception.QLException;
+import org.apache.commons.math3.fraction.BigFraction;
 
 /**
  * 数字运行函数集合
@@ -380,78 +381,39 @@ class PreciseNumberOperator {
     }
 
     public static Number addPrecise(Number op1, Number op2) {
-        BigDecimal result;
-        if (op1 instanceof BigDecimal) {
-            if (op2 instanceof BigDecimal) {
-                result = ((BigDecimal)op1).add((BigDecimal)op2);
-            } else {
-                result = ((BigDecimal)op1).add(new BigDecimal(op2.toString()));
-            }
-        } else {
-            if (op2 instanceof BigDecimal) {
-                result = new BigDecimal(op1.toString()).add((BigDecimal)op2);
-            } else {
-                result = new BigDecimal(op1.toString()).add(new BigDecimal(op2.toString()));
-            }
-        }
-        return basicNumberFormatTransfer(result);
+        BigFraction fraction1 = convert2Fraction(op1);
+        BigFraction fraction2 = convert2Fraction(op2);
+        return fraction1.add(fraction2);
     }
 
     public static Number subtractPrecise(Number op1, Number op2) {
-        BigDecimal result;
-        if (op1 instanceof BigDecimal) {
-            if (op2 instanceof BigDecimal) {
-                result = ((BigDecimal)op1).subtract((BigDecimal)op2);
-            } else {
-                result = ((BigDecimal)op1).subtract(new BigDecimal(op2.toString()));
-            }
-        } else {
-            if (op2 instanceof BigDecimal) {
-                result = new BigDecimal(op1.toString()).subtract((BigDecimal)op2);
-            } else {
-                result = new BigDecimal(op1.toString()).subtract(new BigDecimal(op2.toString()));
-            }
-        }
-        return basicNumberFormatTransfer(result);
+        BigFraction fraction1 = convert2Fraction(op1);
+        BigFraction fraction2 = convert2Fraction(op2);
+        return fraction1.subtract(fraction2);
     }
 
     public static Number multiplyPrecise(Number op1, Number op2) {
-        BigDecimal result;
-        if (op1 instanceof BigDecimal) {
-            if (op2 instanceof BigDecimal) {
-                result = ((BigDecimal)op1).multiply((BigDecimal)op2);
-            } else {
-                result = ((BigDecimal)op1).multiply(new BigDecimal(op2.toString()));
-            }
-        } else {
-            if (op2 instanceof BigDecimal) {
-                result = new BigDecimal(op1.toString()).multiply((BigDecimal)op2);
-            } else {
-                result = new BigDecimal(op1.toString()).multiply(new BigDecimal(op2.toString()));
-            }
-        }
-        return basicNumberFormatTransfer(result);
+        BigFraction fraction1 = convert2Fraction(op1);
+        BigFraction fraction2 = convert2Fraction(op2);
+        return fraction1.multiply(fraction2);
     }
 
     public static Number dividePrecise(Number op1, Number op2) {
-        BigDecimal result;
-        if (op1 instanceof BigDecimal) {
-            if (op2 instanceof BigDecimal) {
-                result = ((BigDecimal)op1).divide((BigDecimal)op2, DIVIDE_PRECISION, RoundingMode.HALF_UP);
-            } else {
-                result = ((BigDecimal)op1).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION,
-                    RoundingMode.HALF_UP);
-            }
+        BigFraction fraction1 = convert2Fraction(op1);
+        BigFraction fraction2 = convert2Fraction(op2);
+        return fraction1.divide(fraction2);
+    }
+
+    private static BigFraction convert2Fraction(Number number){
+        if (number instanceof Double){
+            return new BigFraction((Double)number);
+        }else if (number instanceof BigFraction){
+            return (BigFraction)number;
+        }else if (number instanceof Integer){
+            return new BigFraction((Integer)number);
         } else {
-            if (op2 instanceof BigDecimal) {
-                result = new BigDecimal(op1.toString()).divide((BigDecimal)op2, DIVIDE_PRECISION,
-                    RoundingMode.HALF_UP);
-            } else {
-                result = new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION,
-                    RoundingMode.HALF_UP);
-            }
+            throw new IllegalStateException("不支持的对象执行了\"*\"操作");
         }
-        return basicNumberFormatTransfer(result);
     }
 
     /**
