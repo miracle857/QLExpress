@@ -13,11 +13,13 @@ public class OperatorFactory {
      * 是否需要高精度计算
      */
     private final boolean isPrecise;
+    private final boolean isFraction;
 
     private final Map<String, OperatorBase> operatorMap = new HashMap<>();
 
-    public OperatorFactory(boolean isPrecise) {
+    public OperatorFactory(boolean isPrecise, boolean isFraction) {
         this.isPrecise = isPrecise;
+        this.isFraction = isFraction;
         addOperator("new", new OperatorNew("new"));
         addOperator("anonymousNewArray", new OperatorAnonymousNewArray("anonymousNewArray"));
         addOperator("NewList", new OperatorAnonymousNewList("NewList"));
@@ -73,6 +75,7 @@ public class OperatorFactory {
                 "重复定义操作符：" + name + "定义1：" + existOperator.getClass() + " 定义2：" + operatorBase.getClass());
         }
         operatorBase.setPrecise(this.isPrecise);
+        operatorBase.setFraction(this.isFraction);
         operatorBase.setAliasName(name);
         operatorMap.put(name, operatorBase);
     }

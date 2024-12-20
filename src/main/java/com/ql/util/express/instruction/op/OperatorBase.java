@@ -23,6 +23,7 @@ public abstract class OperatorBase {
      * 是否需要高精度计算
      */
     protected boolean isPrecise = false;
+    protected boolean isFraction = false;
 
     /**
      * 操作数描述
@@ -112,6 +113,14 @@ public abstract class OperatorBase {
 
     public void setPrecise(boolean isPrecise) {
         this.isPrecise = isPrecise;
+    }
+
+    public boolean isFraction() {
+        return isFraction;
+    }
+
+    public void setFraction(boolean fraction) {
+        isFraction = fraction;
     }
 
     public String getErrorInfo() {

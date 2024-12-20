@@ -210,6 +210,26 @@ public class OperatorOfNumber {
         }
     }
 
+    public static Number multiply(Object op1, Object op2, boolean isPrecise, boolean isFraction) throws Exception {
+        if (isFraction){
+            return FractionNumberOperator.multiplyPrecise((Number)op1, (Number)op2);
+        } if (isPrecise) {
+            return PreciseNumberOperator.multiplyPrecise((Number)op1, (Number)op2);
+        } else {
+            return NormalNumberOperator.multiplyNormal((Number)op1, (Number)op2);
+        }
+    }
+
+    public static Number divide(Object op1, Object op2, boolean isPrecise, boolean isFraction) throws Exception {
+        if (isFraction){
+            return FractionNumberOperator.dividePrecise((Number)op1, (Number)op2);
+        } if (isPrecise) {
+            return PreciseNumberOperator.dividePrecise((Number)op1, (Number)op2);
+        } else {
+            return NormalNumberOperator.divideNormal((Number)op1, (Number)op2);
+        }
+    }
+
     public static Number divide(Object op1, Object op2, boolean isPrecise) throws Exception {
         if (isPrecise) {
             return PreciseNumberOperator.dividePrecise((Number)op1, (Number)op2);
@@ -369,14 +389,13 @@ class NormalNumberOperator {
 }
 
 /**
- * 高精度计算
+ * 分数计算
  *
  * @author xuannan
  */
-class PreciseNumberOperator {
-    public static final int DIVIDE_PRECISION = 10;
+class FractionNumberOperator {
 
-    private PreciseNumberOperator() {
+    private FractionNumberOperator() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -416,6 +435,95 @@ class PreciseNumberOperator {
         }
     }
 
+}
+
+/**
+ * 高精度计算
+ *
+ * @author xuannan
+ */
+class PreciseNumberOperator {
+    public static final int DIVIDE_PRECISION = 10;
+
+    private PreciseNumberOperator() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static Number addPrecise(Number op1, Number op2) {
+        BigDecimal result;
+        if (op1 instanceof BigDecimal) {
+            if (op2 instanceof BigDecimal) {
+                result = ((BigDecimal)op1).add((BigDecimal)op2);
+            } else {
+                result = ((BigDecimal)op1).add(new BigDecimal(op2.toString()));
+            }
+        } else {
+            if (op2 instanceof BigDecimal) {
+                result = new BigDecimal(op1.toString()).add((BigDecimal)op2);
+            } else {
+                result = new BigDecimal(op1.toString()).add(new BigDecimal(op2.toString()));
+            }
+        }
+        return basicNumberFormatTransfer(result);
+    }
+
+    public static Number subtractPrecise(Number op1, Number op2) {
+        BigDecimal result;
+        if (op1 instanceof BigDecimal) {
+            if (op2 instanceof BigDecimal) {
+                result = ((BigDecimal)op1).subtract((BigDecimal)op2);
+            } else {
+                result = ((BigDecimal)op1).subtract(new BigDecimal(op2.toString()));
+            }
+        } else {
+            if (op2 instanceof BigDecimal) {
+                result = new BigDecimal(op1.toString()).subtract((BigDecimal)op2);
+            } else {
+                result = new BigDecimal(op1.toString()).subtract(new BigDecimal(op2.toString()));
+            }
+        }
+        return basicNumberFormatTransfer(result);
+    }
+
+    public static Number multiplyPrecise(Number op1, Number op2) {
+        BigDecimal result;
+        if (op1 instanceof BigDecimal) {
+            if (op2 instanceof BigDecimal) {
+                result = ((BigDecimal)op1).multiply((BigDecimal)op2);
+            } else {
+                result = ((BigDecimal)op1).multiply(new BigDecimal(op2.toString()));
+            }
+        } else {
+            if (op2 instanceof BigDecimal) {
+                result = new BigDecimal(op1.toString()).multiply((BigDecimal)op2);
+            } else {
+                result = new BigDecimal(op1.toString()).multiply(new BigDecimal(op2.toString()));
+            }
+        }
+        return basicNumberFormatTransfer(result);
+    }
+
+    public static Number dividePrecise(Number op1, Number op2) {
+        BigDecimal result;
+        if (op1 instanceof BigDecimal) {
+            if (op2 instanceof BigDecimal) {
+                result = ((BigDecimal)op1).divide((BigDecimal)op2, DIVIDE_PRECISION, RoundingMode.HALF_UP);
+            } else {
+                result = ((BigDecimal)op1).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION,
+                        RoundingMode.HALF_UP);
+            }
+        } else {
+            if (op2 instanceof BigDecimal) {
+                result = new BigDecimal(op1.toString()).divide((BigDecimal)op2, DIVIDE_PRECISION,
+                        RoundingMode.HALF_UP);
+            } else {
+                result = new BigDecimal(op1.toString()).divide(new BigDecimal(op2.toString()), DIVIDE_PRECISION,
+                        RoundingMode.HALF_UP);
+            }
+        }
+        return basicNumberFormatTransfer(result);
+    }
+
     /**
      * 格式转化通用
      * @param number
@@ -424,13 +532,14 @@ class PreciseNumberOperator {
     protected static Number basicNumberFormatTransfer(BigDecimal number){
         if (number.scale() == 0) {
             if(number.compareTo(OperatorOfNumber.BIG_DECIMAL_INTEGER_MAX) < OperatorOfNumber.MORE
-                        && number.compareTo(OperatorOfNumber.BIG_DECIMAL_INTEGER_MIN) > OperatorOfNumber.LESS){
+                    && number.compareTo(OperatorOfNumber.BIG_DECIMAL_INTEGER_MIN) > OperatorOfNumber.LESS){
                 return number.intValue();
             }else if(number.compareTo(OperatorOfNumber.BIG_DECIMAL_LONG_MAX) < OperatorOfNumber.MORE
-                            && number.compareTo(OperatorOfNumber.BIG_DECIMAL_LONG_MIN) > OperatorOfNumber.LESS){
+                    && number.compareTo(OperatorOfNumber.BIG_DECIMAL_LONG_MIN) > OperatorOfNumber.LESS){
                 return number.longValue();
             }
         }
         return number;
     }
 }
+

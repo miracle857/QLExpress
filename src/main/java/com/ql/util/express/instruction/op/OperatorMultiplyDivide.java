@@ -17,10 +17,10 @@ public class OperatorMultiplyDivide extends Operator {
         Object result = null;
         switch (this.getName()) {
             case "*":
-                result = OperatorOfNumber.multiply(op1, op2, this.isPrecise);
+                result = OperatorOfNumber.multiply(op1, op2, this.isPrecise, this.isFraction);
                 break;
             case "/":
-                result = OperatorOfNumber.divide(op1, op2, this.isPrecise);
+                result = OperatorOfNumber.divide(op1, op2, this.isPrecise, this.isFraction);
                 break;
             case "%":
             case "mod":

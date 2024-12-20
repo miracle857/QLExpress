@@ -56,6 +56,7 @@ public class ExpressRunner {
      * 是否需要高精度计算
      */
     private final boolean isPrecise;
+    private final boolean isFraction;
 
     /**
      * 一段文本对应的指令集的缓存
@@ -112,15 +113,20 @@ public class ExpressRunner {
     }
 
     public ExpressRunner() {
-        this(false, false);
+        this(false, false, false);
     }
+
+    public ExpressRunner(boolean isPrecise, boolean isTrace) {
+        this(isPrecise, isTrace, false);
+    }
+
 
     /**
      * @param isPrecise 是否需要高精度计算支持
      * @param isTrace   是否跟踪执行指令的过程
      */
-    public ExpressRunner(boolean isPrecise, boolean isTrace) {
-        this(isPrecise, isTrace, new DefaultExpressResourceLoader(), null);
+    public ExpressRunner(boolean isPrecise, boolean isTrace,boolean isFraction) {
+        this(isPrecise, isTrace,isFraction ,new DefaultExpressResourceLoader(), null);
     }
 
     /**
@@ -128,13 +134,13 @@ public class ExpressRunner {
      * @param isTrace
      * @param cacheMap  user can define safe and efficient cache or use default concurrentMap
      */
-    public ExpressRunner(boolean isPrecise, boolean isTrace,
+    public ExpressRunner(boolean isPrecise, boolean isTrace,boolean isFraction,
                          Map<String, Future<InstructionSet>> cacheMap) {
-        this(isPrecise, isTrace, new DefaultExpressResourceLoader(), null, cacheMap);
+        this(isPrecise, isTrace,isFraction, new DefaultExpressResourceLoader(), null, cacheMap);
     }
 
-    public ExpressRunner(boolean isPrecise, boolean isStrace, NodeTypeManager nodeTypeManager) {
-        this(isPrecise, isStrace, new DefaultExpressResourceLoader(), nodeTypeManager);
+    public ExpressRunner(boolean isPrecise, boolean isStrace,boolean isFraction, NodeTypeManager nodeTypeManager) {
+        this(isPrecise, isStrace,isFraction, new DefaultExpressResourceLoader(), nodeTypeManager);
     }
 
     /**
@@ -142,9 +148,9 @@ public class ExpressRunner {
      * @param isTrace                是否跟踪执行指令的过程
      * @param iExpressResourceLoader 表达式的资源装载器
      */
-    public ExpressRunner(boolean isPrecise, boolean isTrace, IExpressResourceLoader iExpressResourceLoader,
+    public ExpressRunner(boolean isPrecise, boolean isTrace,boolean isFraction, IExpressResourceLoader iExpressResourceLoader,
                          NodeTypeManager nodeTypeManager) {
-        this(isPrecise, isTrace, iExpressResourceLoader,
+        this(isPrecise, isTrace,isFraction, iExpressResourceLoader,
                 nodeTypeManager, null);
     }
 
@@ -154,10 +160,11 @@ public class ExpressRunner {
      * @param iExpressResourceLoader 表达式的资源装载器
      * @param cacheMap               指令集缓存, 必须是线程安全的集合
      */
-    public ExpressRunner(boolean isPrecise, boolean isTrace, IExpressResourceLoader iExpressResourceLoader,
+    public ExpressRunner(boolean isPrecise, boolean isTrace, boolean isFraction,IExpressResourceLoader iExpressResourceLoader,
                          NodeTypeManager nodeTypeManager, Map<String, Future<InstructionSet>> cacheMap) {
         this.isTrace = isTrace;
         this.isPrecise = isPrecise;
+        this.isFraction = isFraction;
         this.expressResourceLoader = iExpressResourceLoader;
         if (nodeTypeManager == null) {
             manager = new NodeTypeManager();
@@ -170,7 +177,7 @@ public class ExpressRunner {
         } else {
             expressInstructionSetCache = cacheMap;
         }
-        this.operatorManager = new OperatorFactory(this.isPrecise);
+        this.operatorManager = new OperatorFactory(this.isPrecise, this.isFraction);
         this.loader = new ExpressLoader(this);
         this.parse = new ExpressParse(manager, this.expressResourceLoader, this.isPrecise);
         rootExpressPackage.addPackage("java.lang");
